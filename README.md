@@ -60,7 +60,7 @@ the Native Part messages).
 | Edit a voice parameter (Live edit on) | `F0 43 1n 5C 10 bb pp vv F7`, bb = 00 Common, 10 Scene, 0E Step Seq. Two-byte parameters send `MSB LSB`. |
 | Edit the Free EG (Live edit on) | Current Voice Common bulk (the board only takes Free EG data as a bulk dump), 250 ms after you stop drawing |
 | Send Voice / select a voice (Auto send) | Current Voice bulk dumps: Common (`10 00 00`, 1640 bytes), Scene (`10 10 00`, 122 bytes), Step Seq (`10 0E 00`, 70 bytes) |
-| Send Bank | 128 User Voice bulk dumps (`20 mm 00`, 1832 bytes each). Click again to stop. |
+| Send Bank | 128 User Voice bulk dumps (`20 mm 00`, 1832 bytes each) to the User bank (Bank MSB 36, LSB 2, programs 1–128). Click again to stop. |
 | Store with **Store → PLG** checked | one User Voice bulk dump to the same user voice number |
 | Native tab | `F0 43 1n 5C 00 08 xx vv F7` (PLG150-AN system), `00 00 xx` (AN1x system controller numbers), `09 0p xx` (native part p) |
 | MORPH button | `F0 43 1n 5C 00 08 04 vv F7` (Morph Ctrl: the last used controller, or 00 = off). Not stored in the voice. |
@@ -71,7 +71,9 @@ the Native Part messages).
 
 - The Current Voice data is what you hear while you edit. It is lost when you select another
   voice on the host synth itself. Use **Send Bank** (or **Store → PLG**) to put voices into the
-  board's user memory. Per the Expert Editor manual, the board's user voices are lost when
+  board's user memory: the **User bank, Bank MSB 36 / LSB 2**, programs 1–128. Sending the bank
+  doesn't change the voice that is playing; select that bank and program on the part to hear
+  the new voices. Per the Expert Editor manual, the board's user voices are lost when
   the host synth is switched off; keep them with the host's own storage (e.g. a memory card).
 - The board can't send its data back, so the editor works from its own copy: the built-in
   banks and `.syx` files you open. No MIDI input is used.
@@ -124,6 +126,7 @@ change the times on the instrument.
 ## Files
 
 - `index.html`, `css/style.css`: the UI
+- `favicon.ico`, `icons/`: the page icons (16–512 px PNG renders)
 - `js/an.js`: voice model, parameter map, formatting and `.syx` parsing
 - `js/midi.js`: Web MIDI and SysEx builders
 - `js/graphics.js`: knobs, envelope graphs and the 7-segment LED

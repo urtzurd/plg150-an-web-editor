@@ -4,6 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>PLG150-AN Editor</title>
+  <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/favicon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/favicon-512.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="loading">
@@ -63,7 +68,7 @@
       <div class="btn-group">
         <span class="group-label">BANK → PLG USER</span>
         <div class="group-items">
-          <button class="btn primary" id="sendBank" title="Send the 128 voices of this bank to the PLG150-AN user voices 1–128 (User Voice bulk dumps)">Send Bank</button>
+          <button class="btn primary" id="sendBank" title="Send the 128 voices of this bank to the PLG150-AN User bank (Bank MSB 36, LSB 2), voices 1–128, as User Voice bulk dumps. To hear them, select that bank on the part.">Send Bank</button>
           <label class="check" title="When you store a voice, also send it to the same PLG150-AN user voice number"><input type="checkbox" id="storeToPlg"> Store → PLG</label>
         </div>
       </div>

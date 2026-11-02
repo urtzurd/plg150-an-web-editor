@@ -270,7 +270,7 @@
       onProgress: (i, n) => { btn.textContent = `Stop (${i}/${n})`; },
     }));
     btn.classList.remove('busy-exempt');
-    btn.title = 'Send the 128 voices of this bank to the PLG150-AN user voices 1–128 (User Voice bulk dumps)';
+    btn.title = 'Send the 128 voices of this bank to the PLG150-AN User bank (Bank MSB 36, LSB 2), voices 1–128, as User Voice bulk dumps. To hear them, select that bank on the part.';
     bankSending = false;
     btn.classList.remove('on');
     btn.textContent = 'Send Bank';
