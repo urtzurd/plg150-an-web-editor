@@ -23,6 +23,7 @@
   --key-white: #f4f2ec;
   --key-black: #15171d;
   --key-active: #f0b429;
+  --u: 1px;                   /* panel scale unit: 1px, grows with the Voice page width */
   font-size: 14px;
 }
 
@@ -57,6 +58,7 @@ button, select, input { font: inherit; color: inherit; }
 .setup-fields { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
 .setup-fields label { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
 .setup-fields select { max-width: 220px; }
+.setup-right { margin-left: auto; }
 .status { font-size: 12px; padding: 3px 8px; border-radius: 10px; background: #262d4d; color: var(--muted); }
 .status.ok { background: #1f4130; color: #9fe0b0; }
 .status.err { background: #4a2020; color: #ffb0a8; }
@@ -107,6 +109,7 @@ body.dragging, body.dragging * { cursor: ns-resize !important; user-select: none
 .check { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--muted); white-space: nowrap; }
 
 main { padding: 12px 16px; max-width: 1512px; margin: 0 auto; }
+body.ui-auto main { max-width: 1840px; }   /* UI Scaling "Auto": room for the scaled panel */
 
 .panel {
   background: var(--panel);
@@ -227,7 +230,13 @@ main { padding: 12px 16px; max-width: 1512px; margin: 0 auto; }
    right 14-20). Blocks, their rows and sub-sections are subgrids, so every
    control lines up with the controls above, below and beside it, as on the
    AN Expert Editor. Each cell has the same vertical layout: a 40px control
-   area (knob, button, drop-down), a 13px value line, then the label. */
+   area (knob, button, drop-down), a 13px value line, then the label.
+   Every size is in --u, a "panel pixel": 1px at UI Scaling "Fixed". With UI
+   Scaling "Auto" (body.ui-auto) it grows with the width of the Voice page (1px for
+   a ~55px cell, up to 1.5px), so wider windows get bigger controls instead of
+   empty space. */
+#tab-voice { container-type: inline-size; }
+body.ui-auto .synth { --u: clamp(1px, (100cqi - 216px) / 1100, 1.5px); }
 .synth {
   --cell-gap: 8px;
   display: grid; column-gap: var(--cell-gap); row-gap: 8px;
@@ -245,33 +254,33 @@ main { padding: 12px 16px; max-width: 1512px; margin: 0 auto; }
   background: linear-gradient(160deg, var(--silver-1), var(--silver-2));
   color: var(--silver-text);
   border-radius: 6px 6px 3px 3px;
-  padding: 5px 0 6px;            /* no side padding: it would shift the edge cells off the grid */
+  padding: calc(5 * var(--u)) 0 calc(6 * var(--u));            /* no side padding: it would shift the edge cells off the grid */
   min-width: 0;
   box-shadow: inset 0 1px 0 rgba(255,255,255,.6), 0 1px 3px rgba(0,0,0,.5);
 }
 .blk.hot { box-shadow: inset 0 3px 0 var(--accent-3), inset 0 1px 0 rgba(255,255,255,.6), 0 1px 3px rgba(0,0,0,.5); }
 .blk > *, .subblk > * { grid-column: 1 / -1; }
-.blk-head { display: flex; align-items: center; gap: 8px; height: 18px; margin-bottom: 2px; padding: 0 10px; }
+.blk-head { display: flex; align-items: center; gap: 8px; height: calc(18 * var(--u)); margin-bottom: calc(2 * var(--u)); padding: 0 calc(10 * var(--u)); }
 .blk-head h3, .mini-head h4 {
-  margin: 0; font-size: 13px; font-weight: 900; font-style: italic; letter-spacing: 1.5px;
+  margin: 0; font-size: calc(13 * var(--u)); font-weight: 900; font-style: italic; letter-spacing: 1.5px;
   color: #1f2b6b; text-shadow: 0 1px 0 rgba(255,255,255,.6);
 }
-.mini-head { display: flex; align-items: center; gap: 8px; height: 18px; padding: 0 10px; }
-.mini-head h4 { font-size: 12px; }
+.mini-head { display: flex; align-items: center; gap: 8px; height: calc(18 * var(--u)); padding: 0 calc(10 * var(--u)); }
+.mini-head h4 { font-size: calc(12 * var(--u)); }
 .detail-btn {
-  font-size: 9px; font-weight: 700; letter-spacing: .5px; padding: 1px 5px; cursor: pointer;
+  font-size: calc(9 * var(--u)); font-weight: 700; letter-spacing: .5px; padding: calc(1 * var(--u)) calc(5 * var(--u)); cursor: pointer;
   background: #2b3576; color: #dfe6ff; border: 1px solid #0d1440; border-radius: 2px;
 }
 .detail-btn:hover { background: #3a47a0; }
 /* rows: same height everywhere (room for a 7-lamp list), so rows line up across blocks */
 .krow {
   display: grid; grid-template-columns: subgrid; align-items: start;
-  min-height: 76px;
+  min-height: calc(76 * var(--u));
 }
 .krow.short { min-height: 0; }
 .blk > .krow > *, .subblk > .krow > * { grid-column: auto; }
-.subblk { display: grid; grid-template-columns: subgrid; border-top: 2px solid rgba(15, 23, 51, .3); padding-top: 2px; }
-.subblk h4 { margin: 0 0 1px; padding: 0 10px; font-size: 10px; letter-spacing: 1.5px; font-weight: 800; color: var(--silver-muted); height: 14px; }
+.subblk { display: grid; grid-template-columns: subgrid; border-top: 2px solid rgba(15, 23, 51, .3); padding-top: calc(2 * var(--u)); }
+.subblk h4 { margin: 0 0 calc(1 * var(--u)); padding: 0 calc(10 * var(--u)); font-size: calc(10 * var(--u)); letter-spacing: 1.5px; font-weight: 800; color: var(--silver-muted); height: calc(14 * var(--u)); }
 .slot { min-width: 0; }
 /* VCF: spans panel rows 2-3 and follows them, so the FEG knobs line up with the
    mixer knobs (offset = block padding + header, as in the blocks of row 3) and the
@@ -282,7 +291,10 @@ main { padding: 12px 16px; max-width: 1512px; margin: 0 auto; }
 .vcf-top { grid-row: 1; grid-template-rows: auto auto 1fr; }
 .vcf-top > .subblk { grid-template-rows: auto 1fr; }
 .vcf-top > .subblk > .eg-box { display: flex; flex-direction: column; }
-.vcf-bottom { grid-row: 2; padding-top: 25px; align-content: start; }   /* = row-3 blocks' padding (5) + header (18 + 2) */
+/* the FEG graph only asks for a small height and grows into whatever the LFO
+   blocks leave, so it never makes row 2 taller than the LFOs need */
+.vcf-top > .subblk > .eg-box > .eg { flex: 1 1 0; height: auto; min-height: calc(40 * var(--u)); }
+.vcf-bottom { grid-row: 2; padding-top: calc(25 * var(--u)); align-content: start; }   /* = row-3 blocks' padding (5) + header (18 + 2) */
 
 /* knobs */
 .knob {
@@ -292,27 +304,27 @@ main { padding: 12px 16px; max-width: 1512px; margin: 0 auto; }
 }
 /* inset, so the ring stays inside the cell (edge cells touch the block edge) */
 .knob:focus-visible { box-shadow: inset 0 0 0 2px var(--accent-2); }
-.knob-svg { width: 40px; height: 40px; display: block; flex: none; }
+.knob-svg { width: calc(40 * var(--u)); height: calc(40 * var(--u)); display: block; flex: none; }
 .k-track { fill: none; stroke: rgba(15, 23, 51, .3); stroke-width: 3; stroke-linecap: round; }
 .k-value { fill: none; stroke: #c27a00; stroke-width: 3; stroke-linecap: round; }
 .k-cap { fill: var(--knob); stroke: #000; stroke-width: 1; filter: drop-shadow(0 1px 1px rgba(0,0,0,.5)); }
 .k-ptr { stroke: #f4f4f4; stroke-width: 2.4; stroke-linecap: round; }
 .knob-val {
-  font-family: "Courier New", monospace; font-weight: 700; font-size: 11px; line-height: 13px; height: 13px;
+  font-family: "Courier New", monospace; font-weight: 700; font-size: calc(11 * var(--u)); line-height: calc(13 * var(--u)); height: calc(13 * var(--u));
   white-space: nowrap; color: #0b1640; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
 }
 .knob-val { cursor: text; }
 .knob-val:hover { text-decoration: underline dotted; }
 .knob-edit {
-  width: calc(100% - 6px); max-width: 64px; height: 15px; margin: -1px 0; padding: 0 2px; text-align: center;
-  font-family: "Courier New", monospace; font-weight: 700; font-size: 11px;
+  width: calc(100% - 6px); max-width: calc(64 * var(--u)); height: calc(15 * var(--u)); margin: calc(-1 * var(--u)) 0; padding: 0 2px; text-align: center;
+  font-family: "Courier New", monospace; font-weight: 700; font-size: calc(11 * var(--u));
   background: var(--lcd-bg); color: var(--lcd-text); border: 1px solid var(--accent-2); border-radius: 2px;
 }
 /* no outline (it is drawn outside the box); a brighter border shows focus instead */
 .knob-edit:focus { outline: none; border-color: #9fd2ff; box-shadow: inset 0 0 0 1px #9fd2ff; }
 .knob-lbl, .lamps-lbl, .toggle-lbl, .lcdsel-lbl {
-  font-size: 9px; font-weight: 800; letter-spacing: .4px; color: var(--silver-muted);
-  text-transform: uppercase; line-height: 11px; text-align: center; max-width: 100%;
+  font-size: calc(9 * var(--u)); font-weight: 800; letter-spacing: .4px; color: var(--silver-muted);
+  text-transform: uppercase; line-height: calc(11 * var(--u)); text-align: center; max-width: 100%;
 }
 .knob.small { width: 46px; }
 .knob.small .knob-svg { width: 32px; height: 32px; }
@@ -321,32 +333,32 @@ main { padding: 12px 16px; max-width: 1512px; margin: 0 auto; }
 /* panel push buttons, lamps, toggles: the button sits in the 40px control
    area, the label on the knob-label line (40 + 13 px down) */
 .pbtn {
-  width: 34px; height: 20px; padding: 0; cursor: pointer; position: relative; flex: none;
+  width: calc(34 * var(--u)); height: calc(20 * var(--u)); padding: 0; cursor: pointer; position: relative; flex: none;
   background: linear-gradient(#59607a, #2a2f44); border: 1px solid #0b0e1a; border-radius: 3px;
   box-shadow: 0 2px 0 #0b0e1a, inset 0 1px 0 rgba(255,255,255,.25);
 }
 .pbtn:active { transform: translateY(1px); box-shadow: 0 1px 0 #0b0e1a; }
 .pbtn:disabled { cursor: default; opacity: .6; }
 .pbtn .led-dot { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
-.led-dot { display: inline-block; width: 14px; height: 5px; border-radius: 1px; background: #1d3a12; box-shadow: inset 0 0 2px #000; }
+.led-dot { display: inline-block; width: calc(14 * var(--u)); height: calc(5 * var(--u)); border-radius: 1px; background: #1d3a12; box-shadow: inset 0 0 2px #000; }
 .pbtn.lit .led-dot, .led-dot.lit { background: var(--lamp-on); box-shadow: 0 0 5px var(--lamp-on); }
 .toggle { display: flex; flex-direction: column; align-items: center; min-width: 0; }
-.toggle .pbtn { margin: 10px 0; }
-.toggle-lbl { margin-top: 13px; }
-.toggle.placeholder .pbtn { width: 28px; height: 16px; margin: 12px 0; opacity: .8; }
-.toggle.placeholder .toggle-lbl { margin-top: 13px; color: #56617f; }
+.toggle .pbtn { margin: calc(10 * var(--u)) 0; }
+.toggle-lbl { margin-top: calc(13 * var(--u)); }
+.toggle.placeholder .pbtn { width: calc(28 * var(--u)); height: calc(16 * var(--u)); margin: calc(12 * var(--u)) 0; opacity: .8; }
+.toggle.placeholder .toggle-lbl { margin-top: calc(13 * var(--u)); color: #56617f; }
 .toggle.placeholder[hidden] { display: none; }
-.lamps { display: flex; gap: 4px; align-items: flex-start; justify-content: center; min-width: 0; }
+.lamps { display: flex; gap: calc(4 * var(--u)); align-items: flex-start; justify-content: center; min-width: 0; }
 .lamps-btncol { display: flex; flex-direction: column; align-items: center; }
-.lamps-btncol .pbtn { margin: 10px 0; }
-.lamps-lbl { margin-top: 13px; }
+.lamps-btncol .pbtn { margin: calc(10 * var(--u)) 0; }
+.lamps-lbl { margin-top: calc(13 * var(--u)); }
 .lamp-list { list-style: none; margin: 0; padding: 1px 0 0; display: flex; flex-direction: column; }
 .lamp {
-  font-size: 9px; font-weight: 800; letter-spacing: .2px; line-height: 10.5px; cursor: pointer;
-  white-space: nowrap; color: var(--silver-text); padding-left: 10px; position: relative;
+  font-size: calc(9 * var(--u)); font-weight: 800; letter-spacing: .2px; line-height: calc(10.5 * var(--u)); cursor: pointer;
+  white-space: nowrap; color: var(--silver-text); padding-left: calc(10 * var(--u)); position: relative;
 }
 .lamp::before {
-  content: ""; position: absolute; left: 0; top: 50%; width: 6px; height: 6px; margin-top: -3px;
+  content: ""; position: absolute; left: 0; top: 50%; width: calc(6 * var(--u)); height: calc(6 * var(--u)); margin-top: calc(-3 * var(--u));
   border-radius: 50%; background: #34421f; box-shadow: inset 0 0 1px #000;
 }
 .lamp.on::before { background: var(--lamp-on); box-shadow: 0 0 4px var(--lamp-on); }
@@ -364,11 +376,11 @@ main { padding: 12px 16px; max-width: 1512px; margin: 0 auto; }
   .synth .krow > .lamps { display: grid; grid-template-columns: subgrid; justify-content: initial; gap: normal; }
   .synth .krow > .lamps > .lamps-btncol { grid-column: 1; justify-self: center; }
   .synth .krow > .lamps > .lamp-list { grid-column: 2; justify-self: start; min-width: max-content; }
-  .synth .krow > .lamps > .lamp-list.long { margin-top: -11px; }
+  .synth .krow > .lamps > .lamp-list.long { margin-top: calc(-11 * var(--u)); }
   .synth .krow > .oct { display: grid; grid-template-columns: subgrid; justify-items: center; }
   .synth .krow > .oct > .oct-leds, .synth .krow > .oct > .knob-lbl { grid-column: 1 / -1; }
   .synth .krow > .oct > .oct-btns { display: contents; }
-  .synth .krow > .oct .pbtn { margin: 7px 0 2px; grid-row: 2; }
+  .synth .krow > .oct .pbtn { margin: calc(7 * var(--u)) 0 calc(2 * var(--u)); grid-row: 2; }
 }
 
 /* LCD-style drop-downs */
@@ -376,30 +388,30 @@ main { padding: 12px 16px; max-width: 1512px; margin: 0 auto; }
 .lcdsel { display: flex; flex-direction: column; align-items: center; min-width: 0; padding: 0 2px; }
 .lcdsel select {
   background: var(--lcd-bg); color: var(--lcd-text); border: 1px solid #000; border-radius: 2px;
-  font-family: "Courier New", monospace; font-weight: 700; font-size: 11px; padding: 0 3px; height: 20px;
-  max-width: 100%; margin: 10px 0; cursor: pointer;
+  font-family: "Courier New", monospace; font-weight: 700; font-size: calc(11 * var(--u)); padding: 0 3px; height: calc(20 * var(--u));
+  max-width: 100%; margin: calc(10 * var(--u)) 0; cursor: pointer;
 }
-.lcdsel-lbl { margin-top: 13px; }
+.lcdsel-lbl { margin-top: calc(13 * var(--u)); }
 .lcdsel.wide { align-items: stretch; }
 /* voice name box in the Common panel: same look as the LCD drop-downs */
 .name-cell .voice-name {
   background: var(--lcd-bg); color: var(--lcd-text); border: 1px solid #000; border-radius: 2px;
-  font-family: "Courier New", monospace; font-weight: 700; font-size: 11px; height: 20px; padding: 0 3px;
-  margin: 10px 0; width: 100%; letter-spacing: .4px;
+  font-family: "Courier New", monospace; font-weight: 700; font-size: calc(11 * var(--u)); height: calc(20 * var(--u)); padding: 0 3px;
+  margin: calc(10 * var(--u)) 0; width: 100%; letter-spacing: .4px;
 }
 .name-cell .voice-name:focus { outline: none; border-color: #9fd2ff; box-shadow: inset 0 0 0 1px #9fd2ff; }
 .name-cell .voice-name:disabled { opacity: .7; }
 .lcdsel.wide select { width: 100%; }
-.krow.short .lcdsel select { margin: 2px 0; }
-.krow.short .lcdsel-lbl { margin: 0 0 2px; }
+.krow.short .lcdsel select { margin: calc(2 * var(--u)) 0; }
+.krow.short .lcdsel-lbl { margin: 0 0 calc(2 * var(--u)); }
 
 /* envelopes: inset to the cell edges; stage times under the curve */
-.eg-box { margin: 1px 8px 3px; background: #0b1230; border: 1px solid #000; border-radius: 2px; min-width: 0; }
+.eg-box { margin: calc(1 * var(--u)) calc(8 * var(--u)) calc(3 * var(--u)); background: #0b1230; border: 1px solid #000; border-radius: 2px; min-width: 0; }
 /* one height for the PEG, FEG and AEG graphs (the FEG graph fills its VCF area at this size) */
-.eg { width: 100%; height: 69px; display: block; }
+.eg { width: 100%; height: calc(69 * var(--u)); display: block; }
 .eg-times {
-  display: flex; justify-content: space-between; gap: 6px; padding: 1px 5px 2px;
-  font-family: "Courier New", monospace; font-weight: 700; font-size: 10px; line-height: 12px;
+  display: flex; justify-content: space-between; gap: 6px; padding: calc(1 * var(--u)) calc(5 * var(--u)) calc(2 * var(--u));
+  font-family: "Courier New", monospace; font-weight: 700; font-size: calc(10 * var(--u)); line-height: calc(12 * var(--u));
   color: #9fe7ff; white-space: nowrap; overflow: hidden; border-top: 1px solid #1b2552;
 }
 .eg-div { stroke: #3a4670; stroke-width: 1; stroke-dasharray: 2 2; vector-effect: non-scaling-stroke; }
@@ -410,16 +422,16 @@ main { padding: 12px 16px; max-width: 1512px; margin: 0 auto; }
 
 /* top block: octave, P.B., matrix and free EG summary */
 .oct { display: flex; flex-direction: column; align-items: center; min-width: 0; }
-.oct-leds { display: flex; gap: 3px; margin-top: 4px; height: 7px; }
-.oct-leds .led-dot { width: 7px; height: 7px; border-radius: 50%; }
-.oct-btns { display: flex; gap: 6px; margin: 7px 0 2px; }
-.oct .knob-lbl { margin-top: 13px; }
+.oct-leds { display: flex; gap: calc(3 * var(--u)); margin-top: calc(4 * var(--u)); height: calc(7 * var(--u)); }
+.oct-leds .led-dot { width: calc(7 * var(--u)); height: calc(7 * var(--u)); border-radius: 50%; }
+.oct-btns { display: flex; gap: calc(6 * var(--u)); margin: calc(7 * var(--u)) 0 calc(2 * var(--u)); }
+.oct .knob-lbl { margin-top: calc(13 * var(--u)); }
 .mtx-summary {
-  margin-top: 4px; background: var(--lcd-bg); color: var(--lcd-text); border-radius: 2px; padding: 3px 6px;
-  font-family: "Courier New", monospace; font-size: 11px; font-weight: 700;
+  margin-top: calc(4 * var(--u)); background: var(--lcd-bg); color: var(--lcd-text); border-radius: 2px; padding: 3px 6px;
+  font-family: "Courier New", monospace; font-size: calc(11 * var(--u)); font-weight: 700;
   /* fixed at four lines; more routings scroll */
   /* vertical inset is a border, not padding, so the 5th line never peeks into it */
-  --mtx-lh: 14px; height: calc(4 * var(--mtx-lh) + 6px); overflow-y: auto;
+  --mtx-lh: calc(14 * var(--u)); height: calc(4 * var(--mtx-lh) + 6px); overflow-y: auto;
   padding-block: 0; border-block: 3px solid var(--lcd-bg); scroll-snap-type: y mandatory;
   scrollbar-width: thin; scrollbar-color: #3a4670 transparent;
 }
@@ -430,7 +442,7 @@ main { padding: 12px 16px; max-width: 1512px; margin: 0 auto; }
 .mtx-par { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .mtx-dep { color: #9fe7ff; }
 .mtx-more { opacity: .75; }
-.mtx-summary { margin: 4px 6px 0; }
+.mtx-summary { margin: calc(4 * var(--u)) calc(6 * var(--u)) 0; }
 /* CTRL MATRIX block: the list spans the knob row and the free space below it;
    Free EG (header + selectors) is pushed to the bottom of the block */
 .blk.blk-top { grid-template-rows: auto auto 1fr auto auto; }

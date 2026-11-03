@@ -78,7 +78,7 @@
   const settings = Object.assign({
     out: '', device: 0, channel: 0, part: 0,
     liveSend: true, autoSend: true, storeToPlg: false,
-    velocity: 100, octave: 0, bank: 'Preset 1', perfHidden: false, fegTrack: 0, gridExpanded: false,
+    velocity: 100, octave: 0, bank: 'Preset 1', perfHidden: false, uiScaling: 'fixed', fegTrack: 0, gridExpanded: false,
   }, store.get('settings', {}));
   const saveSettings = () => store.set('settings', settings);
 
@@ -630,8 +630,10 @@
       d, wrap,
       refresh() {
         const v = shownVoice();
-        // o.labels: shorter option texts for narrow cells (the title shows the full one)
-        const ls = o.labels || AN.optsOf(d, v) || range(d.max - d.min + 1, i => fmtValue(d, d.min + i));
+        // o.labels: shorter option texts for narrow cells (the title shows the full one);
+        // an array, or a function of the voice
+        const short = typeof o.labels === 'function' ? o.labels(v) : o.labels;
+        const ls = short || AN.optsOf(d, v) || range(d.max - d.min + 1, i => fmtValue(d, d.min + i));
         const s = ls.join('|');
         if (s !== sig) {
           sig = s;
@@ -641,7 +643,7 @@
         const raw = getRaw(d);
         if (![...sel.options].some(op => +op.value === raw)) sel.appendChild(new Option(String(raw), raw));
         sel.value = raw;
-        sel.title = o.labels ? `${labelOf(d)}: ${fmtValue(d, raw)}` : labelOf(d);
+        sel.title = short ? `${labelOf(d)}: ${fmtValue(d, raw)}` : labelOf(d);
         sel.disabled = state.comparing && isVoiceParam(d);
         wrap.classList.toggle('inactive', isVoiceParam(d) && !AN.isActive(d, v));
         applyCompare(wrap, d);
@@ -915,6 +917,16 @@
     pgButton(0, 'ARPEGGIO', 16);
     pgButton(1, 'SEQ', 17);
     makeLcdSelect(r, P.pgType, { at: 18, span: 3, label: 'TYPE / PATTERN', cls: 'wide' });
+    // second row: the play settings, so the block fills the height of PEG / CTRL MATRIX
+    r = row(b);
+    makeLcdSelect(r, P.pgKbdMode, {
+      at: 14, label: 'KBD MODE', cls: 'wide',
+      labels: v => (AN.get(v, P.pgSelect) === 1 ? ['Normal', 'Shift+Norm', 'PtnSel+Norm', 'PtnSel+Shft'] : ['Chord', 'Chord+Norm']),
+    });
+    makeLcdSelect(r, P.arpSubdivide, { at: 16, label: 'SUBDIVIDE', cls: 'wide' });
+    makeKnob(r, P.pgVelocity, { at: 18, label: 'VELOCITY', title: 'Arpeggio / step sequencer velocity (0 = real, as played)' });
+    makeKnob(r, P.pgGate, { at: 19, label: 'GATE', title: 'Arpeggio / step sequencer gate time' });
+    makeKnob(r, P.swing, { at: 20, label: 'SWING' });
 
     // ---- row 2: LFOs and VCF (VCF + FEG span rows 2-3)
     // Each LFO depth has a cell in both LFO blocks: the knob sits in the LFO it
@@ -1025,13 +1037,13 @@
       depthLabel: v => (AN.get(v, P.vco2Wave) >= 4 ? 'X-MOD' : 'DEPTH'), pwLabel: 'PW',
     });
 
+    // AEG graph, then one row of knobs (volume and velocity beside the AEG knobs),
+    // so the block is no taller than the two-row VCO blocks beside it
     b = block('vca', 'VCA', { col: 14, span: 7, row: 4, cls: 'hot' });
+    graphics.aeg = Graphics.createEnvelope(b);
     r = row(b);
-    makeKnob(r, P.volume, { at: 16, label: 'VOLUME' });
-    makeKnob(r, P.aegVel, { at: 20, label: 'VELOCITY', title: 'AEG velocity sensitivity' });
-    s = sub(b, 'AEG');
-    graphics.aeg = Graphics.createEnvelope(s);
-    r = row(s);
+    makeKnob(r, P.volume, { at: 14, label: 'VOLUME' });
+    makeKnob(r, P.aegVel, { at: 15, label: 'VELOCITY', title: 'AEG velocity sensitivity' });
     makeKnob(r, P.aegA, { at: 17, label: 'ATTACK' });
     makeKnob(r, P.aegD, { at: 18, label: 'DECAY' });
     makeKnob(r, P.aegS, { at: 19, label: 'SUSTAIN' });
@@ -1961,6 +1973,11 @@
       refreshPorts();
     });
     $('midiConnect').addEventListener('click', enableMidi);
+    const applyUiScaling = () => document.body.classList.toggle('ui-auto', settings.uiScaling === 'auto');
+    if (settings.uiScaling !== 'auto') settings.uiScaling = 'fixed';   // unknown or missing value
+    $('uiScaling').value = settings.uiScaling;
+    applyUiScaling();
+    $('uiScaling').addEventListener('change', e => { settings.uiScaling = e.target.value; saveSettings(); applyUiScaling(); });
 
     const bindCheck = (id, key) => {
       $(id).checked = settings[key];

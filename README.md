@@ -137,3 +137,5 @@ change the times on the instrument.
 ## Changelog
 
 - 1/Nov/2026: First version of the editor.
+- 3/Nov/2026: New UI Scaling option in the top bar. Fixed keeps the usual sizes; Auto makes the Voice page controls grow with the window width (on windows wider than about 1300px).
+- 3/Nov/2026: Voice page layout uses the space better: the Pattern Gen. block has a second row (Kbd Mode, Subdivide, Velocity, Gate, Swing), the VCA block shows Volume and Velocity beside the AEG knobs under the graph, and the FEG graph fits the height of the LFO blocks.
